@@ -36,10 +36,12 @@ static guchar *needle = NULL;
  * Sorry for the many commented pieces of code. It's work in progress...
  *************/
 
-static current_mode = SIMPLE_ENTRY;
+static int current_mode = SIMPLE_ENTRY;
 
 static GtkTextBuffer *entryBuf = NULL;
+#if 0
 static GtkListStore *mdl = NULL;
+#endif
 static GtkWidget *simpleSheet = NULL/*, *structSheet = NULL*/;
 static gulong simpleSigID = 0/*, structSigID = 0*/;
 

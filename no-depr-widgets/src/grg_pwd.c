@@ -97,7 +97,7 @@ meta_browse (GtkWidget * data, GtkWidget * entry)
 static GRG_KEY
 read_pwd_file (const gchar * path, GtkWidget * dlg, gboolean X)
 {
-	GtkWidget *wait;
+	GtkWidget *wait = NULL;
 	gint fd, len;
 	gchar *pwd, *upath;
 	GRG_KEY key;
@@ -140,7 +140,7 @@ read_pwd_file (const gchar * path, GtkWidget * dlg, gboolean X)
 static GRG_KEY
 read_pwd_disk (GtkWidget * dlg, gboolean X)
 {
-	GtkWidget *wait;
+	GtkWidget *wait = NULL;
 	gint fd, len;
 	gchar *file;
 	GRG_KEY key = NULL;
@@ -243,7 +243,7 @@ vis_quality (gpointer ignore, gpointer type)
 	case TYPE_PWD:
 	{
 		gint bout;
-		gchar *sq;
+		gchar *sq = NULL;
 
 		if (!mapIsUTF)
 			sq = g_locale_from_utf8 (gtk_entry_get_text

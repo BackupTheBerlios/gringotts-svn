@@ -380,7 +380,7 @@ guint grg_entries_n_el (void);
 void
 grg_entries_print (gint ennum, gchar * enpage)
 {
-	gchar *utfenpage;
+	gchar *utfenpage = NULL;
 	guint ulen;
 	if (ennum < 0 && enpage == NULL)
 	{
@@ -442,11 +442,13 @@ meta_save (gpointer data, gpointer user_data)
 	{
 		struct grg_attachment *att =
 			(struct grg_attachment *) attlist->data;
+        void * void_origfile;
 		guchar *origfile, *b64file, *append;
 
-		grg_get_content (att, (void **) &origfile, NULL);
+		grg_get_content (att, &void_origfile, NULL);
+        origfile = (guchar*)void_origfile;
 		b64file = grg_encode64 (origfile, att->filedim, NULL);
-		GRGFREE (origfile, att->filedim);
+		GRGFREE (void_origfile, att->filedim);
 		append = g_strdup_printf (XML_ATT_FORMAT, attachments,
 					  att->filename, att->comment,
 					  b64file);
