@@ -227,6 +227,14 @@ find (GtkWidget *widget, gpointer callback_data)
 						  g_utf8_strlen (needle, -1));
 			gtk_text_buffer_move_mark (entryBuf, endsel,
 						   &position);
+
+            /*
+             * Make sure that the text-view window scrolls to view the current 
+             * selection.
+             * */
+            gtk_text_view_scroll_mark_onscreen (GTK_TEXT_VIEW (simpleSheet),
+				gtk_text_buffer_get_mark (entryBuf,
+				"insert"));
 			break;
 		}
 		else
