@@ -1489,7 +1489,7 @@ grg_interface (void)
 	// the title widget
 	title = gtk_label_new ("");
 	gtk_misc_set_alignment (GTK_MISC (title), 0.1, 0.5);
-	btitle = gtk_button_new_with_mnemonic (_("_Edit..."));
+	btitle = gtk_button_new_with_mnemonic (_("E_dit..."));
 	g_signal_connect (G_OBJECT (btitle), "clicked", G_CALLBACK (retitle),
 			  NULL);
 	pfd = pango_font_description_new ();
