@@ -33,6 +33,7 @@
 #include "grg_prefs_io.h"
 #include "grg_defs.h"
 #include "gringotts.h"
+#include "grg_safe.h"
 
 gint
 grg_save_prefs (void)

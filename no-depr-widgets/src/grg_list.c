@@ -25,6 +25,7 @@
 #include "grg_entries.h"
 #include "grg_defs.h"
 #include "grg_pix.h"
+#include "grg_widgets.h"
 
 enum
 {
@@ -238,13 +239,15 @@ grg_list_run (void)
 	tbar = gtk_toolbar_new ();
 	gtk_toolbar_set_orientation (GTK_TOOLBAR (tbar),
 				     GTK_ORIENTATION_VERTICAL);
+#if 0
 	gtk_toolbar_set_icon_size (GTK_TOOLBAR (tbar),
 				   GTK_ICON_SIZE_LARGE_TOOLBAR);
-	bup = gtk_toolbar_insert_stock (GTK_TOOLBAR (tbar), GTK_STOCK_GO_UP,
+#endif
+	bup = grg_toolbar_insert_stock (GTK_TOOLBAR (tbar), GTK_STOCK_GO_UP,
 					_("Move up"), "",
 					(GtkSignalFunc) move_row,
 					GINT_TO_POINTER (TRUE), -1);
-	bdown = gtk_toolbar_insert_stock (GTK_TOOLBAR (tbar),
+	bdown = grg_toolbar_insert_stock (GTK_TOOLBAR (tbar),
 					  GTK_STOCK_GO_DOWN, _("Move down"),
 					  "", (GtkSignalFunc) move_row,
 					  GINT_TO_POINTER (FALSE), -1);

@@ -27,6 +27,7 @@
 #include "grg_defs.h"
 #include "grg_safe.h"
 #include "grg_entries_vis.h"
+#include "grg_widgets.h"
 
 #include <gdk/gdkkeysyms.h>
 

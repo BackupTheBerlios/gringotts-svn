@@ -25,6 +25,7 @@
 #include "gringotts.h"
 #include "grg_entries.h"
 #include "grg_prefs.h"
+#include "grg_widgets.h"
 
 static GtkClipboard *clip = NULL;
 static gboolean isThereAClip = FALSE;

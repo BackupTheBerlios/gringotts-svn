@@ -19,13 +19,6 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-/*
- * This is so we can use GTK_OPTION_MENU.
- * */
-#ifdef GTK_DISABLE_DEPRECATED
-#undef GTK_DISABLE_DEPRECATED
-#endif
-
 #include <stdlib.h>
 #include <limits.h>
 #include <sys/stat.h>
@@ -56,22 +49,22 @@
 
 //appends a stock item to a toolbar
 #define	TOOLBAR_INS_STOCK(tbar, stock, callback, tooltip) \
-	gtk_toolbar_insert_stock (GTK_TOOLBAR (tbar), stock, tooltip, \
+	grg_toolbar_insert_stock (GTK_TOOLBAR (tbar), stock, tooltip, \
 		"", (GtkSignalFunc) callback, NULL, -1)
 
 //appends a stock item to a toolbar, assigning it to a widget
 #define	TOOLBAR_INS_STOCK_WIDGET(tbar, stock, callback, tooltip, wid) \
-	wid = gtk_toolbar_insert_stock (GTK_TOOLBAR (tbar), stock, tooltip, \
+	wid = grg_toolbar_insert_stock (GTK_TOOLBAR (tbar), stock, tooltip, \
 		"", (GtkSignalFunc) callback, NULL, -1)
 
 //appends a stock item to a toolbar, assigning it to a widget and passing a value to the callback
 #define	TOOLBAR_INS_STOCK_WIDGET_SIGNAL(tbar, stock, callback, tooltip, signal, wid) \
-	wid = gtk_toolbar_insert_stock (GTK_TOOLBAR (tbar), stock, tooltip, \
+	wid = grg_toolbar_insert_stock (GTK_TOOLBAR (tbar), stock, tooltip, \
 		"", (GtkSignalFunc) callback, GINT_TO_POINTER (signal), -1)
 
 //appends a space to a toolbar
 #define TOOLBAR_INS_SPACE(tbar) \
-	gtk_toolbar_append_space (GTK_TOOLBAR (tbar))
+	my_toolbar_append_space (GTK_TOOLBAR (tbar))
 
 /* - some menu buttons are never deactivated (i.e. Quit), so their widgets aren't really needed
  */
@@ -88,7 +81,9 @@ static GtkWidget *btitle;
 // main toolbar 
 static GtkWidget *tnew, *topen, *tsave, *tclose;
 static GtkWidget *tadd, *trem, *tcut, *tcopy, *tpast, *tfind, *tpref;
-static GtkWidget *batadd, *batrem, *batsav, *batinf, *batchco, *combo_attach;
+static GtkWidget *batadd, *batrem, *batsav, *batinf, *batchco;
+static GtkComboBox *combo_attach;
+static GtkListStore * combo_attach_list_store;
 
 static guchar *grgfile = NULL, *caption = NULL;
 static gboolean started = FALSE, gtk_loop_started = FALSE;
@@ -100,6 +95,18 @@ GList *garbage = NULL;
 
 GRG_CTX gctx = NULL;
 glong pwdbirth = 0;
+
+GtkTooltips * tooltips = NULL;
+
+static void
+my_toolbar_append_space (GtkToolbar * toolbar)
+{
+    GtkToolItem * separator;
+
+    separator = gtk_separator_tool_item_new();
+
+    gtk_toolbar_insert (toolbar, separator, -1);
+}
 
 /*
  * nyi:
@@ -305,12 +312,7 @@ meta_saveable (gpointer data, gpointer user_data)
 static void
 update_combo_attach (void)
 {
-	GtkWidget *old =
-		gtk_option_menu_get_menu (GTK_OPTION_MENU (combo_attach));
-	GtkWidget *new = grg_attachment_get_menu ();
-	gtk_widget_destroy (old);
-	gtk_option_menu_remove_menu (GTK_OPTION_MENU (combo_attach));
-	gtk_option_menu_set_menu (GTK_OPTION_MENU (combo_attach), new);
+    grg_attachment_fill_combo_box (combo_attach);
 }
 
 void set_editor_font (const guchar * font_desc);
@@ -361,7 +363,7 @@ update (void)
 	gtk_widget_set_sensitive (batsav, isAttachSelected);
 	gtk_widget_set_sensitive (batinf, isAttachSelected);
 	gtk_widget_set_sensitive (batchco, isAttachSelected);
-	gtk_widget_set_sensitive (combo_attach, isAttachSelected);
+	gtk_widget_set_sensitive (GTK_WIDGET (combo_attach), isAttachSelected);
 
 	gtk_label_set_text (GTK_LABEL (title),
 			    isStuffed ? grg_entries_get_ID () : GRG_CAP_NAME
@@ -979,7 +981,9 @@ retitle (void)
 static void
 save_as (const gchar * fpath)
 {
+#if 0
 	GtkWidget *wait;
+#endif
 	gchar *tmpfile;
 	gint err, fd;
 	gboolean is_current = STR_EQ (fpath, grgfile);	//Am I saving the current file?
@@ -1247,12 +1251,15 @@ static void
 destroy_splash (GtkWidget * w, GdkEvent * ev, GtkWidget * w2)
 {
 	gtk_widget_destroy (w2);
-	gtk_timeout_remove (tout);
+	g_source_remove (tout);
 }
 
 static gboolean
-destroy_splash_timed (GtkWidget * w)
+destroy_splash_timed (gpointer void_w)
 {
+    GtkWidget * w;
+
+    w = (GtkWidget *)void_w;
 	gtk_widget_destroy (w);
 	return FALSE;
 }
@@ -1289,8 +1296,8 @@ grg_splash (GtkWidget * parent)
 	g_signal_connect (G_OBJECT (spebox), "button-press-event",
 			  G_CALLBACK (destroy_splash), spwin);
 
-	tout = gtk_timeout_add (GRG_SPLASH_TIMEOUT,
-				(GtkFunction) destroy_splash_timed, spwin);
+	tout = g_timeout_add (GRG_SPLASH_TIMEOUT,
+				(GSourceFunc) destroy_splash_timed, spwin);
 
 	return spwin;
 }
@@ -1457,6 +1464,9 @@ grg_interface (void)
 	GtkSizeGroup *resizer;
 	gchar *str, *fdesc;
 	PangoFontDescription *pfd;
+    GtkCellRenderer *cell;
+
+    tooltips = gtk_tooltips_new();
 
 	// window
 	win1 = gtk_window_new (GTK_WINDOW_TOPLEVEL);
@@ -1503,8 +1513,6 @@ grg_interface (void)
 	gtk_toolbar_set_style (GTK_TOOLBAR (tbar_nav), GTK_TOOLBAR_ICONS);
 	gtk_toolbar_set_orientation (GTK_TOOLBAR (tbar_nav),
 				     GTK_ORIENTATION_VERTICAL);
-	gtk_toolbar_set_icon_size (GTK_TOOLBAR (tbar_nav),
-				   GTK_ICON_SIZE_LARGE_TOOLBAR);
 	handle_nav = gtk_handle_box_new ();
 	gtk_handle_box_set_handle_position (GTK_HANDLE_BOX (handle_nav),
 					    GTK_POS_TOP);
@@ -1539,16 +1547,24 @@ grg_interface (void)
 
 	//the "main" toolbar
 	tbar_main = gtk_toolbar_new ();
-	gtk_toolbar_set_icon_size (GTK_TOOLBAR (tbar_main),
-				   GTK_ICON_SIZE_LARGE_TOOLBAR);
 	gtk_toolbar_set_style (GTK_TOOLBAR (tbar_main), GTK_TOOLBAR_ICONS);
 	handle_main = gtk_handle_box_new ();
 	gtk_container_add (GTK_CONTAINER (handle_main), tbar_main);
 
 	str = grg_get_security_text (_("Security level: %s"));
-	gtk_toolbar_append_item (GTK_TOOLBAR (tbar_main), _("Security"), str,
-				 NULL, grg_get_security_button (),
-				 grg_security_monitor, NULL);
+
+    {
+        GtkToolItem * button;
+        button = gtk_tool_button_new (grg_get_security_button(), _("Security"));
+
+        gtk_tool_item_set_tooltip (button, tooltips,
+            str, NULL);
+        
+        g_signal_connect (button, "clicked",
+            grg_security_monitor, NULL);
+        
+        gtk_toolbar_insert (GTK_TOOLBAR (tbar_main), button, -1);
+    }
 	g_free (str);
 
 	TOOLBAR_INS_SPACE (tbar_main);
@@ -1600,8 +1616,6 @@ grg_interface (void)
 
 	//attachment handling toolbar
 	tbar_attach = gtk_toolbar_new ();
-	gtk_toolbar_set_icon_size (GTK_TOOLBAR (tbar_attach),
-				   GTK_ICON_SIZE_LARGE_TOOLBAR);
 	gtk_toolbar_set_style (GTK_TOOLBAR (tbar_attach), GTK_TOOLBAR_ICONS);
 	handle_attach = gtk_handle_box_new ();
 	gtk_container_add (GTK_CONTAINER (handle_attach), tbar_attach);
@@ -1610,9 +1624,18 @@ grg_interface (void)
 			    1);
 	gtk_box_pack_start (GTK_BOX (scrollbox), scroll, TRUE, TRUE, 1);
 
-	gtk_toolbar_append_widget (GTK_TOOLBAR (tbar_attach),
-				   gtk_label_new (_("Attached files")), "",
-				   "");
+    {
+        GtkToolItem * button;
+
+        button = gtk_tool_item_new ();
+        gtk_container_add (GTK_CONTAINER (button), 
+                gtk_label_new (_("Attached files")));
+        
+        gtk_tool_item_set_tooltip (button, tooltips,
+            "", "");
+
+        gtk_toolbar_insert (GTK_TOOLBAR (tbar_attach), button, -1);
+    }
 
 /*	TOOLBAR_INS_STOCK (tbar_attach, GTK_STOCK_DIALOG_WARNING, attach_warn,
 			   _("Important informations\non this feature"));*/
@@ -1630,11 +1653,32 @@ grg_interface (void)
 				  change_attach_comment, _("Change comment"),
 				  batchco);
 
-	combo_attach = gtk_option_menu_new ();
-	gtk_option_menu_set_menu (GTK_OPTION_MENU (combo_attach),
-				  grg_attachment_get_menu ());
-	gtk_toolbar_append_widget (GTK_TOOLBAR (tbar_attach), combo_attach,
-				   _("List of attached files"), "");
+    combo_attach_list_store =
+        gtk_list_store_new (2, G_TYPE_STRING, G_TYPE_INT);
+    combo_attach =
+        GTK_COMBO_BOX (gtk_combo_box_new_with_model (
+                GTK_TREE_MODEL (combo_attach_list_store)
+                ));
+
+    cell = gtk_cell_renderer_text_new ();
+    gtk_cell_layout_pack_start (GTK_CELL_LAYOUT (combo_attach), cell, TRUE);
+    gtk_cell_layout_set_attributes (GTK_CELL_LAYOUT (combo_attach), cell,
+                                    "text", ATTACHMENT_TITLE,
+                                    NULL);
+
+    grg_attachment_fill_combo_box (combo_attach);
+    {
+        GtkToolItem * button;
+
+        button = gtk_tool_item_new ();
+        gtk_container_add (GTK_CONTAINER (button), 
+                GTK_WIDGET (combo_attach));
+        
+        gtk_tool_item_set_tooltip (button, tooltips,
+            _("List of attached files"), "");
+
+        gtk_toolbar_insert (GTK_TOOLBAR (tbar_attach), button, -1);
+    }
 
 	vbox = gtk_vbox_new (FALSE, 1);
 	gtk_widget_show (vbox);

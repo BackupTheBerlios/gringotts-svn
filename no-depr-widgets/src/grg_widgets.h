@@ -22,6 +22,8 @@
 #ifndef GRG_WIDGETS_H
 #define GRG_WIDGETS_H
 
+#include "grg_defs.h"
+
 gboolean mapIsUTF;
 
 //Shows and manages a dialog that asks for a string.
@@ -36,8 +38,8 @@ void report_err (gchar * msg, gboolean X, gboolean doquit,
 		 GtkWidget * parent);
 
 //Asks a question for a boolean answer.
-gboolean grg_ask_dialog (gchar * title, gchar * question, gboolean allowcanc,
-			 GtkWidget * parent);
+grg_response grg_ask_dialog (gchar * title, gchar * question, 
+        gboolean allowcanc, GtkWidget * parent);
 
 //Associates the Gringotts icon with the given window.
 void grg_window_set_icon (GtkWindow * w);
@@ -54,5 +56,16 @@ void grg_display_file (gchar * file);
 
 //callback to submit a form when enter is pressed
 gboolean return_submit (GtkWidget * w, GdkEventKey * ev, GtkWidget * w2);
+
+GtkWidget * 
+grg_toolbar_insert_stock(GtkToolbar *toolbar,
+    const gchar *stock_id,
+    const char *tooltip_text,
+    const char *tooltip_private_text,
+    GtkSignalFunc callback,
+    gpointer user_data,
+    gint position);
+
+extern GtkTooltips * tooltips;
 
 #endif

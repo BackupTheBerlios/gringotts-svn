@@ -21,6 +21,8 @@
 
 #include <stdio.h>
 #include <fcntl.h>
+#include <unistd.h>
+#include <stdlib.h>
 
 #include <glib.h>
 #include <popt.h>
@@ -29,6 +31,9 @@
 #include "gringotts.h"
 #include "grg_pwd.h"
 #include "grg_popt.h"
+#include "grg_safe.h"
+#include "grg_entries.h"
+#include "grg_widgets.h"
 
 #include <libgringotts.h>
 

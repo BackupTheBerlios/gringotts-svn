@@ -104,4 +104,6 @@ gboolean update_saveable (gint mode);
 guchar *get_editor_font (void);
 void set_editor_font (const guchar * font_desc);
 
+void update (void);
+
 #endif

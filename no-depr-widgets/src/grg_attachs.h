@@ -37,7 +37,14 @@ gint grg_get_content (struct grg_attachment *att, void **cont,
 gboolean grg_save_attachment (gchar * path, GtkWidget * parent);
 void grg_info_attachment (GtkWidget * parent);
 void grg_attach_list_free (GList * ceal);
-GtkWidget *grg_attachment_get_menu (void);
+
+enum
+{
+  ATTACHMENT_TITLE,
+  ATTACHMENT_ID
+};
+
+void grg_attachment_fill_combo_box (GtkComboBox * combo_attach);
 
 gboolean grg_attachment_change_comment (GtkWidget * parent);
 #endif

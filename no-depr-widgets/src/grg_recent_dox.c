@@ -30,6 +30,7 @@
 #include "grg_recent_dox.h"
 #include "grg_menus.h"
 #include "grg_defs.h"
+#include "grg_safe.h"
 
 GSList *grg_recent_dox = NULL;
 

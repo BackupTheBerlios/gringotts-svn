@@ -326,9 +326,14 @@ modify_passes (GtkWidget * data, gpointer value)
 static void
 modify_font (GtkWidget * data, gpointer value)
 {
-	GtkWidget *font_selector, *wait;
+	GtkWidget *font_selector;
+#if 0
+    GtkWidget *wait;
+#endif
 	gint response;
+#if 0
 	gchar *selection = NULL;
+#endif
 	PangoFontDescription *pfd;
 
 	font_selector = gtk_font_selection_dialog_new ("Select a font...");

@@ -20,6 +20,7 @@
  */
 #include <string.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #include <gtk/gtk.h>
 #include <gdk-pixbuf/gdk-pixbuf.h>
@@ -27,6 +28,8 @@
 #include "grg_defs.h"
 #include "grg_pix.h"
 #include "../pixmaps/gringotts.xpm"
+#include "gringotts.h"
+#include "grg_widgets.h"
 
 gboolean mapIsUTF = FALSE;
 
@@ -297,8 +300,9 @@ grg_find_dialog (guchar ** needle, gboolean * only_current,
 }
 
 static gboolean
-exit_wait_timed (GtkWidget * w)
+exit_wait_timed (gpointer void_w)
 {
+    GtkWidget * w = (GtkWidget *)void_w;
 	gtk_dialog_response (GTK_DIALOG (w), GTK_RESPONSE_DELETE_EVENT);
 	return FALSE;
 }
@@ -336,7 +340,7 @@ grg_wait_msg (gchar * reason, GtkWidget * parent)
 
 	gtk_widget_show_all (wait);
 
-	gtk_timeout_add (GRG_VISUAL_LATENCY, (GtkFunction) exit_wait_timed,
+	g_timeout_add (GRG_VISUAL_LATENCY, exit_wait_timed,
 			 wait);
 	gtk_dialog_run (GTK_DIALOG (wait));
 
@@ -359,7 +363,7 @@ grg_wait_message_change_reason (GtkWidget * wait, gchar * reason)
 	g_list_free (child1);
 	g_list_free (child2);
 
-	gtk_timeout_add (GRG_VISUAL_LATENCY, (GtkFunction) exit_wait_timed,
+	g_timeout_add (GRG_VISUAL_LATENCY, exit_wait_timed,
 			 wait);
 	gtk_dialog_run (GTK_DIALOG (wait));
 }
@@ -400,4 +404,28 @@ grg_display_file (gchar * file)
 		g_free (command);
 		i++;
 	}
+}
+
+GtkWidget * 
+grg_toolbar_insert_stock(GtkToolbar *toolbar,
+    const gchar *stock_id,
+    const char *tooltip_text,
+    const char *tooltip_private_text,
+    GtkSignalFunc callback,
+    gpointer user_data,
+    gint position)
+{
+    GtkToolItem * item;
+
+    item = gtk_tool_button_new_from_stock(stock_id);
+
+    gtk_tool_item_set_tooltip (item, tooltips,
+            tooltip_text, tooltip_private_text);
+
+    g_signal_connect (item, "clicked",
+			          callback, user_data);
+
+    gtk_toolbar_insert (toolbar, item, position);
+
+    return GTK_WIDGET (item);
 }

@@ -33,6 +33,8 @@
 #include "grg_entries.h"
 #include "gringotts.h"
 #include "grg_widgets.h"
+#include "grg_safe.h"
+#include "grg_attachs.h"
 
 gint current_attach_ID;
 
@@ -351,9 +353,21 @@ grg_attachment_change_comment (GtkWidget * parent)
 }
 
 static void
-set_ID (gpointer ignore, gpointer ID)
+set_ID (gpointer ignore, gpointer void_combo_attach)
 {
-	current_attach_ID = GPOINTER_TO_INT (ID);
+    GtkComboBox * combo_attach;
+    GtkTreeIter iter;
+
+    combo_attach = (GtkComboBox *)void_combo_attach;
+
+    if (gtk_combo_box_get_active_iter (combo_attach, &iter))
+    {
+        GValue value = { 0, };
+        
+        gtk_tree_model_get_value (gtk_combo_box_get_model (combo_attach),
+                &iter, ATTACHMENT_ID, &value);
+        current_attach_ID = g_value_get_int (&value);
+    }
 }
 
 static gchar *
@@ -395,58 +409,67 @@ gen_index_string (const gchar * fname, const glong dim)
 	return ret;
 }
 
-GtkWidget *
-grg_attachment_get_menu (void)
+void
+grg_attachment_fill_combo_box (GtkComboBox * combo_attach)
 {
-	GList *ceal;
-	GtkWidget *menu = gtk_menu_new ();
+    GList *ceal;
 
-	if (current)
-		ceal = ((struct grg_entry *) current->data)->attach;
-	else
-		ceal = NULL;
+    if (current)
+        ceal = ((struct grg_entry *) current->data)->attach;
+    else
+        ceal = NULL;
 
-	if (!ceal)
-	{
-		GtkWidget *menu_item =
-			gtk_menu_item_new_with_label (_
-						      ("<no file attached>"));
+    if (!ceal)
+    {
+        GtkTreeIter iter;
+        GtkTreeModel *model;
 
-		gtk_widget_show (menu_item);
-		gtk_menu_shell_append (GTK_MENU_SHELL (menu), menu_item);
+        model = gtk_combo_box_get_model(combo_attach);
+        gtk_list_store_clear (GTK_LIST_STORE (model));
+        
+        gtk_list_store_append (GTK_LIST_STORE (model), &iter);
+        gtk_list_store_set (GTK_LIST_STORE (model), &iter,
+                ATTACHMENT_TITLE, _("<no file attached>"),
+                ATTACHMENT_ID, (-1),
+                -1
+                );
+        gtk_combo_box_set_active_iter (combo_attach, &iter);
+        gtk_widget_set_sensitive (GTK_WIDGET (combo_attach), FALSE);
+        current_attach_ID = -1;
+    }
+    else
+    {
+        GtkTreeIter iter;
+        GtkTreeModel *model;
+        model = gtk_combo_box_get_model(combo_attach);
+        gtk_list_store_clear (GTK_LIST_STORE (model));
+        
+        current_attach_ID =
+            ((struct grg_attachment *) ceal->data)->ID;
+        while (ceal)
+        {
+            struct grg_attachment *att =
+                (struct grg_attachment *) ceal->data;
+            gchar *lbl;
 
-		g_signal_connect (G_OBJECT (menu_item), "activate",
-				  G_CALLBACK (set_ID), GINT_TO_POINTER (-1));
-		current_attach_ID = -1;
-	}
-	else
-	{
-		current_attach_ID =
-			((struct grg_attachment *) ceal->data)->ID;
-		while (ceal)
-		{
-			struct grg_attachment *att =
-				(struct grg_attachment *) ceal->data;
-			gchar *lbl;
-			GtkWidget *menu_item;
+            lbl = gen_index_string (att->filename, att->filedim);
 
-			lbl = gen_index_string (att->filename, att->filedim);
+            gtk_list_store_append (GTK_LIST_STORE (model), &iter);
+            gtk_list_store_set (GTK_LIST_STORE (model), &iter,
+                ATTACHMENT_TITLE, lbl,
+                ATTACHMENT_ID, (att->ID),
+                -1
+                );
 
-			menu_item = gtk_menu_item_new_with_label (lbl);
+            GRGAFREE (lbl);
 
-			GRGAFREE (lbl);
+            ceal = ceal->next;
+        }
+        g_signal_connect (G_OBJECT (combo_attach), "changed",
+                          G_CALLBACK (set_ID),
+                          (gpointer)combo_attach);
 
-			gtk_widget_show (menu_item);
-			gtk_menu_shell_append (GTK_MENU_SHELL (menu),
-					       menu_item);
-
-			g_signal_connect (G_OBJECT (menu_item), "activate",
-					  G_CALLBACK (set_ID),
-					  GINT_TO_POINTER (att->ID));
-
-			ceal = ceal->next;
-		}
-	}
-
-	return menu;
+        gtk_widget_set_sensitive (GTK_WIDGET (combo_attach), TRUE);
+    }
 }
+
