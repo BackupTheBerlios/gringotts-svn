@@ -19,6 +19,13 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
+/*
+ * This is so we can use GTK_OPTION_MENU.
+ * */
+#ifdef GTK_DISABLE_DEPRECATED
+#undef GTK_DISABLE_DEPRECATED
+#endif
+
 #include <stdlib.h>
 #include <limits.h>
 #include <sys/stat.h>
