@@ -1,0 +1,13 @@
+If you remove a floppy disk during reading, the program will exit with a
+SIGBUS error. Not so kind of it, uhu?
+
+It all occupies just too much memory. Moreover, it's mlock()ed, so the
+program lives always on the edge... :(
+
+If you open the pref windows and press OK without change anything, the file
+becomes saveable even if you didn't actually make any modify. I'm sorry, but
+the severity of the problem isn't worth the complexity of the fix, IMHO.
+
+When opening files with non-latin1 filenames, the title of the window in some
+cases (i.e. in RH 8.0+) won't display properly. This seems to be more GTK+ than
+Gringotts-related.

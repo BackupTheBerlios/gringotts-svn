@@ -1,0 +1,14 @@
+    --------------------------------
+   --- Changes from 1.2.7 release ---
+    --------------------------------
+
+2003-10-19 Mano <mano78@users.sourceforge.net>
+
+	* fixed further "find" problems
+	* my e-mail address isn't mano@pluto.linux.it anymore, it's
+	  mano78@users.sourceforge.net
+
+2003-10-18 Mano <mano78@users.sourceforge.net>
+
+	* applied a patch by Bastian Kleineidam <calvin@debian.org> to
+	  fix a bug in find function. Many thanks to him!
