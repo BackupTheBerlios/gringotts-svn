@@ -38,7 +38,7 @@
 gint
 grg_save_prefs (void)
 {
-	guchar *path, *row, algo, *grg_pref_file_local,
+	gchar *path, *row, algo, *grg_pref_file_local,
 		*grg_pref_font_string_local;
 	gint fd;
 

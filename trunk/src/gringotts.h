@@ -99,10 +99,10 @@ void wipe_file (void);
 void about (void);
 
 //Performs an action about saveability.
-gboolean update_saveable (gint mode);
+gboolean update_saveable (grg_saveable mode);
 
-guchar *get_editor_font (void);
-void set_editor_font (const guchar * font_desc);
+gchar *get_editor_font (void);
+void set_editor_font (const gchar * font_desc);
 
 void update (void);
 

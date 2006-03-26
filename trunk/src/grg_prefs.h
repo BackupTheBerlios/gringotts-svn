@@ -32,9 +32,9 @@ gboolean grg_prefs_clip_clear_on_quit;
 gint grg_prefs_xpire;
 gint grg_prefs_wipe_passes;
 
-guchar *get_pref_file (void);
+gchar *get_pref_file (void);
 void set_pref_file (const guchar * newval);
-guchar *get_pref_font_string (void);
+gchar *get_pref_font_string (void);
 void set_pref_font_string (const guchar * newval);
 void set_pref_font_string_from_editor (void);
 

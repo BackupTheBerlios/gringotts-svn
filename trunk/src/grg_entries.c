@@ -36,7 +36,7 @@
 
 static GList *entries = NULL;
 GList *current = NULL;
-static guchar *serialized;
+static gchar *serialized;
 static gint pos_to_restore;
 static gboolean newer_data = FALSE;
 static gchar *afname, *afcomment;
@@ -443,10 +443,10 @@ meta_save (gpointer data, gpointer user_data)
 		struct grg_attachment *att =
 			(struct grg_attachment *) attlist->data;
         void * void_origfile;
-		guchar *origfile, *b64file, *append;
+		gchar *origfile, *b64file, *append;
 
 		grg_get_content (att, &void_origfile, NULL);
-        origfile = (guchar*)void_origfile;
+        origfile = (gchar*)void_origfile;
 		b64file = grg_encode64 (origfile, att->filedim, NULL);
 		GRGFREE (void_origfile, att->filedim);
 		append = g_strdup_printf (XML_ATT_FORMAT, attachments,
@@ -645,7 +645,7 @@ grg_entries_load_from_string (gchar * str, GtkWidget * parent, gboolean X)
  * Returns: 0 if OK; an error code otherwise (see libgringotts' docs)
  */
 gint
-grg_load_wrapper (guchar ** txt, GRG_KEY key, const gint fd,
+grg_load_wrapper (gchar ** txt, GRG_KEY key, const gint fd,
 		  const gchar * file)
 {
 	gint err;

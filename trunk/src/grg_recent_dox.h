@@ -28,6 +28,6 @@ GSList *grg_recent_dox;
 
 void grg_recent_dox_init (void);
 void grg_recent_dox_deinit (void);
-void grg_recent_dox_push (const guchar * file);
+void grg_recent_dox_push (const gchar * file);
 
 #endif

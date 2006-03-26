@@ -47,6 +47,8 @@
 
 #include <libgringotts.h>
 
+#include "gringotts.h"
+
 //appends a stock item to a toolbar
 #define	TOOLBAR_INS_STOCK(tbar, stock, callback, tooltip) \
 	grg_toolbar_insert_stock (GTK_TOOLBAR (tbar), stock, tooltip, \
@@ -85,7 +87,7 @@ static GtkWidget *batadd, *batrem, *batsav, *batinf, *batchco;
 static GtkComboBox *combo_attach;
 static GtkListStore * combo_attach_list_store;
 
-static guchar *grgfile = NULL, *caption = NULL;
+static gchar *grgfile = NULL, *caption = NULL;
 static gboolean started = FALSE, gtk_loop_started = FALSE;
 static gboolean created = FALSE;
 static guint tout;
@@ -315,8 +317,6 @@ update_combo_attach (void)
     grg_attachment_fill_combo_box (combo_attach);
 }
 
-void set_editor_font (const guchar * font_desc);
-
 /**
  * update:
  *
@@ -471,7 +471,7 @@ revert (void)
 	      _("You'll lose all the changes from\nlast save! Are you sure?"),
 	      FALSE, win1) == GRG_YES))
 	{
-		guchar *tmp = NULL;
+		gchar *tmp = NULL;
 		GtkWidget *wait = grg_wait_msg (_("loading"), win1);
 
 		gint err, fd;
@@ -600,7 +600,7 @@ load_file (gchar * filename)
 	GtkWidget *wait;
 	GRG_KEY tmpkey;
 	gint err, fd;
-	guchar *res;
+	gchar *res;
 	struct stat buf1, buf2;
 
 	if (!filename || !*filename)
@@ -996,7 +996,7 @@ save_as (const gchar * fpath)
 		    (fpath + strlen (fpath) - SUFFIX_LEN, SUFFIX,
 		     SUFFIX_LEN) != 0)
 		{
-			guchar *tmp = g_strconcat (tmpfile, SUFFIX, NULL);
+			gchar *tmp = g_strconcat (tmpfile, SUFFIX, NULL);
 			g_free (tmpfile);
 			tmpfile = g_strdup (tmp);
 			g_free (tmp);
@@ -1432,7 +1432,7 @@ change_attach_comment (void)
 		update_saveable (GRG_SAVE_ACTIVE);
 }
 
-guchar *
+gchar *
 get_editor_font (void)
 {
 	PangoContext *editorFont = gtk_widget_get_pango_context (edit);
@@ -1442,7 +1442,7 @@ get_editor_font (void)
 }
 
 void
-set_editor_font (const guchar * font_desc)
+set_editor_font (const gchar * font_desc)
 {
 	PangoFontDescription *fdesc =
 		pango_font_description_from_string (font_desc);
@@ -1736,14 +1736,14 @@ gint
 main (gint argc, gchar ** argv)
 {
 	gchar *file2load = NULL, *file2loadInArgv = NULL, *finalfile = NULL;
-	gchar *version = grg_get_version (); //libgringotts version
+	guchar *version = grg_get_version (); //libgringotts version
 	gint prefs_err;
 	gboolean root = FALSE;
 
 	if (!grg_mlockall_and_drop_root_privileges ())
 		exit (1);
 
-	gctx = grg_context_initialize_defaults ("GRG");
+	gctx = grg_context_initialize_defaults ((guchar*)"GRG");
 
 	//parse cmdline args
 	grg_parse_argv (argc, argv, &file2loadInArgv, &root);

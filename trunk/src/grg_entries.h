@@ -99,7 +99,7 @@ void grg_entries_load_from_string (gchar * str, GtkWidget * parent,
 				   gboolean X);
 
 //Wrapper to file-related functions, to add UTF-8 handling
-gint grg_load_wrapper (guchar ** txt, GRG_KEY key, const gint fd,
+gint grg_load_wrapper (gchar ** txt, GRG_KEY key, const gint fd,
 		       const gchar * file);
 
 //Searches for a text in the entries.

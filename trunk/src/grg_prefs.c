@@ -71,7 +71,7 @@ gboolean grg_prefs_clip_clear_on_quit = TRUE;
 gint grg_prefs_xpire = EXP_TIME_DEF;	//abs(x)= num of days; < 0 = never
 gint grg_prefs_wipe_passes = WIPE_PASSES_DEF;
 
-guchar *
+gchar *
 get_pref_file (void)
 {
 	if (grg_pref_file)
@@ -86,7 +86,7 @@ set_pref_file (const guchar * newval)
 	grg_pref_file = g_strdup (newval);
 }
 
-guchar *
+gchar *
 get_pref_font_string (void)
 {
 	if (grg_prefs_editor_font)
@@ -104,7 +104,7 @@ set_pref_font_string (const guchar * newval)
 void
 set_pref_font_string_from_editor (void)
 {
-	guchar *newval = get_editor_font ();
+	gchar *newval = get_editor_font ();
 	set_pref_font_string (newval);
 	g_free (newval);
 }

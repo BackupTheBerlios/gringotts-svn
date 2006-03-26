@@ -144,7 +144,7 @@ recent_dox_save (void)
 }
 
 void
-grg_recent_dox_push (const guchar * file)
+grg_recent_dox_push (const gchar * file)
 {
 	GSList *cur, *tmp;
 
