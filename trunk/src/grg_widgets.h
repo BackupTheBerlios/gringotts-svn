@@ -44,7 +44,7 @@ grg_response grg_ask_dialog (gchar * title, gchar * question,
 //Associates the Gringotts icon with the given window.
 void grg_window_set_icon (GtkWindow * w);
 
-gboolean grg_find_dialog (guchar ** needle, gboolean * only_current,
+gboolean grg_find_dialog (gchar ** needle, gboolean * only_current,
 			  gboolean * case_sens, GtkWindow * parent);
 
 //displays a "Wait..." window, to be destroyed at the end of waiting

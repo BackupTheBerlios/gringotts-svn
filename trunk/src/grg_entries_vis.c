@@ -30,7 +30,7 @@
 static GtkClipboard *clip = NULL;
 static gboolean isThereAClip = FALSE;
 
-static guchar *needle = NULL;
+static gchar *needle = NULL;
 
 /**************
  * Sorry for the many commented pieces of code. It's work in progress...
@@ -182,7 +182,7 @@ find (GtkWidget *widget, gpointer callback_data)
         guint again = GPOINTER_TO_UINT(callback_data);
 	static gboolean only_current, case_sens;
 	gint found, offset = 0;
-	guchar *buf;
+	gchar *buf;
 	GtkTextIter position;
 	GtkTextMark *cursor, *endsel;
         GtkWidget *parent = gtk_widget_get_toplevel(widget);

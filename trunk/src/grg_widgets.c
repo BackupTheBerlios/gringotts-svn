@@ -232,7 +232,7 @@ grg_window_set_icon (GtkWindow * w)
  * grg_find_dialog:
  */
 gboolean
-grg_find_dialog (guchar ** needle, gboolean * only_current,
+grg_find_dialog (gchar ** needle, gboolean * only_current,
 		 gboolean * case_sens, GtkWindow * parent)
 {
 	GtkWidget *dialog, *question, *label, *chk1, *chk2;

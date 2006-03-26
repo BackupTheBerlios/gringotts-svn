@@ -59,7 +59,7 @@ create_model (void)
 	for (i = 0; i < max; i++, grg_entries_next ())
 	{
 		guint nat = grg_entries_n_att ();
-		guchar *snat =
+		gchar *snat =
 			(nat == 0) ? g_strdup ("-") : g_strdup_printf ("%d",
 								       nat);
 

@@ -447,7 +447,7 @@ meta_save (gpointer data, gpointer user_data)
 
 		grg_get_content (att, &void_origfile, NULL);
         origfile = (gchar*)void_origfile;
-		b64file = grg_encode64 (origfile, att->filedim, NULL);
+		b64file = (gchar*)grg_encode64 ((guchar*)origfile, att->filedim, NULL);
 		GRGFREE (void_origfile, att->filedim);
 		append = g_strdup_printf (XML_ATT_FORMAT, attachments,
 					  att->filename, att->comment,
@@ -503,7 +503,7 @@ grg_entries_save (gchar * file, GRG_KEY key, GtkWidget * parent)
 
 	grg_wait_message_change_reason (wait, _("saving"));
 
-	err = grg_encrypt_file (gctx, key, file, serialized,
+	err = grg_encrypt_file (gctx, key, (guchar*)file, (guchar*)serialized,
 				strlen (serialized));
 
 	grg_wait_message_change_reason (wait, _("cleaning up"));
@@ -576,7 +576,7 @@ compose_entry (GMarkupParseContext * context,
 	case ATTACH_FIELD:
 	{
 		guint dim;
-		gchar *decoded = grg_decode64 (text, text_len, &dim);
+		gchar *decoded = (gchar*)grg_decode64 ((guchar*)text, text_len, &dim);
 		grg_attach_content (decoded, dim, afname, afcomment);
 		GRGFREE (decoded, dim);
 		GRGAFREE (afname);
@@ -649,9 +649,15 @@ grg_load_wrapper (gchar ** txt, GRG_KEY key, const gint fd,
 		  const gchar * file)
 {
 	gint err;
-	gulong len = 0;
+	glong len = 0;
+    guchar *unsigned_txt;
 
-	err = grg_decrypt_file_direct (gctx, key, fd, txt, &len);
+    /* I'm doing this assignment in and out because one cannot guarantee that
+     * pointers of different types will be the same.
+     * */
+    unsigned_txt = (guchar*)*txt;
+	err = grg_decrypt_file_direct (gctx, key, fd, &unsigned_txt, &len);
+    *txt = (gchar*)unsigned_txt;
 
 	grg_prefs_update ();
 
@@ -713,7 +719,7 @@ glong
 grg_entries_find (gchar * needle, glong offset, gboolean only_current,
 		  gboolean case_sens)
 {
-	guchar *text = grg_entries_get_Body (), *start =
+	gchar *text = grg_entries_get_Body (), *start =
 		g_utf8_offset_to_pointer (text, offset), *occur;
 	glong result;
 

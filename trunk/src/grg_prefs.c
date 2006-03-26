@@ -42,8 +42,8 @@
 #define NEW_ROW_SEPARATOR(box) \
 	gtk_box_pack_start(GTK_BOX(box), gtk_hseparator_new(), FALSE, FALSE, 0);
 
-static guchar *grg_pref_file = NULL;
-static guchar *grg_prefs_editor_font = NULL;
+static gchar *grg_pref_file = NULL;
+static gchar *grg_prefs_editor_font = NULL;
 
 static guchar tmp_pref_crypto;
 static guchar tmp_pref_hash;
@@ -80,7 +80,7 @@ get_pref_file (void)
 }
 
 void
-set_pref_file (const guchar * newval)
+set_pref_file (const gchar * newval)
 {
 	g_free (grg_pref_file);
 	grg_pref_file = g_strdup (newval);
@@ -95,7 +95,7 @@ get_pref_font_string (void)
 }
 
 void
-set_pref_font_string (const guchar * newval)
+set_pref_font_string (const gchar * newval)
 {
 	g_free (grg_prefs_editor_font);
 	grg_prefs_editor_font = g_strdup (newval);
@@ -144,7 +144,7 @@ reset_values (GtkWidget * parent)
 {
 	if (grg_load_prefs () != GRG_OK)
 	{
-		guchar *msg =
+		gchar *msg =
 			_("Invalid preferences file. Resetting to defaults.");
 		grg_msg (msg, GTK_MESSAGE_WARNING, parent);
 		grg_prefs_reset_defaults ();

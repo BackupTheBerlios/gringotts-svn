@@ -318,7 +318,7 @@ collect_pref (GMarkupParseContext * context,
 gint
 grg_load_prefs (void)
 {
-	guchar *path, *content, active_opt = 0;
+	gchar *path, *content, active_opt = 0;
 	gint fd, end;
 	GMarkupParser *context =
 		(GMarkupParser *) grg_malloc (sizeof (GMarkupParser));

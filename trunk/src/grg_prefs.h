@@ -33,9 +33,9 @@ gint grg_prefs_xpire;
 gint grg_prefs_wipe_passes;
 
 gchar *get_pref_file (void);
-void set_pref_file (const guchar * newval);
+void set_pref_file (const gchar * newval);
 gchar *get_pref_font_string (void);
-void set_pref_font_string (const guchar * newval);
+void set_pref_font_string (const gchar * newval);
 void set_pref_font_string_from_editor (void);
 
 void grg_pref_dialog (GtkWidget * parent);
