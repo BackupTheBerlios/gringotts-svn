@@ -99,7 +99,8 @@ read_pwd_file (const gchar * path, GtkWidget * dlg, gboolean X)
 {
 	GtkWidget *wait = NULL;
 	gint fd, len;
-	gchar *pwd, *upath;
+	gchar *upath;
+    guchar *pwd;
 	GRG_KEY key;
 	struct stat buf;
 
@@ -142,7 +143,7 @@ read_pwd_disk (GtkWidget * dlg, gboolean X)
 {
 	GtkWidget *wait = NULL;
 	gint fd, len;
-	gchar *file;
+	guchar *file;
 	GRG_KEY key = NULL;
 
 #if defined(BLOCK_DEV_IS_FLOPPY) && defined(HAVE_LINUX_FD_H)
@@ -251,12 +252,12 @@ vis_quality (gpointer ignore, gpointer type)
 						 NULL, &bout, NULL);
 
 		gtk_progress_bar_set_fraction (GTK_PROGRESS_BAR (quality),
-					       grg_ascii_pwd_quality (mapIsUTF
+					       grg_ascii_pwd_quality ((guchar*)(mapIsUTF
 								      ?
 								      gtk_entry_get_text
 								      (GTK_ENTRY
 								       (question))
-								      : sq,
+								      : sq),
 								      g_utf8_strlen
 								      (gtk_entry_get_text
 								       (GTK_ENTRY
@@ -270,12 +271,12 @@ vis_quality (gpointer ignore, gpointer type)
 	case TYPE_FILE:
 	{
 		gchar *upath =
-			g_filename_from_utf8 ((guchar *)
+			g_filename_from_utf8 (
 					      gtk_entry_get_text (GTK_ENTRY
 								  (file_entry)),
 					      -1, NULL, NULL, NULL);
 		gtk_progress_bar_set_fraction (GTK_PROGRESS_BAR (quality),
-					       grg_file_pwd_quality (upath));
+					       grg_file_pwd_quality ((guchar*)upath));
 		g_free (upath);
 	}
 		break;
@@ -440,14 +441,14 @@ grg_new_pwd_dialog (GtkWidget * parent)
 				break;
 			}
 
-			key = grg_key_gen (ret1, pwd_len);
+			key = grg_key_gen ((guchar*)ret1, pwd_len);
 
 			exit = TRUE;
 			break;
 		}
 		case TYPE_FILE:
 		{
-			const guchar *path =
+			const gchar *path =
 				gtk_entry_get_text (GTK_ENTRY (file_entry));
 
 			key = read_pwd_file (path, dialog, TRUE);
@@ -615,13 +616,13 @@ grg_ask_pwd_dialog (GtkWidget * parent)
 		switch (curr_type_pwd_req)
 		{
 		case TYPE_PWD:
-			key = grg_key_gen (gtk_entry_get_text
+			key = grg_key_gen ((guchar*)gtk_entry_get_text
 					   (GTK_ENTRY (entry)), -1);
 			exit = TRUE;
 			break;
 		case TYPE_FILE:
 		{
-			const guchar *path =
+			const gchar *path =
 				gtk_entry_get_text (GTK_ENTRY (entry));
 			key = read_pwd_file (path, dlg, TRUE);
 
@@ -718,12 +719,12 @@ grg_get_cmdline_key (void)
 			gsize ulen;
 
 			UTF8d = g_locale_to_utf8 (pwd, -1, NULL, &ulen, NULL);
-			ret = grg_key_gen (UTF8d, ulen);
+			ret = grg_key_gen ((guchar*)UTF8d, ulen);
 			GRGFREE (UTF8d, ulen);
 			ulen = 0;
 		}
 		else
-			ret = grg_key_gen (pwd, -1);
+			ret = grg_key_gen ((guchar*)pwd, -1);
 		GRGAFREE (pwd);
 	}
 		break;

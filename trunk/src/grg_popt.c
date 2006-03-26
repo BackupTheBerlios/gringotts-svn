@@ -47,7 +47,7 @@ dump_content (gchar * fname, gint ennum, gchar * enpage)
 	GRG_KEY key;
 	glong len;
 	gint err, fd;
-	guchar *txt;
+	gchar *txt;
 
 #ifndef HAVE_TCGETATTR
 	fprintf (stderr, "%s: %s\n", _("Warning"),
@@ -119,7 +119,11 @@ dump_content (gchar * fname, gint ennum, gchar * enpage)
 			continue;
 		}
 
-		err = grg_decrypt_file_direct (gctx, key, fd, &txt, &len);
+        {
+            guchar *unsigned_txt;
+		    err = grg_decrypt_file_direct (gctx, key, fd, &unsigned_txt, &len);
+            txt = (gchar*)unsigned_txt;
+        }
 
 		grg_key_free (gctx, key);
 

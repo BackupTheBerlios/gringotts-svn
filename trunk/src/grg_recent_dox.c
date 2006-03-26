@@ -52,7 +52,7 @@ gather_paths (GMarkupParseContext * context, const gchar * text,
 void
 grg_recent_dox_init (void)
 {
-	guchar *path, *content;
+	gchar *path, *content;
 	int fd, end;
 	GMarkupParser *context =
 		(GMarkupParser *) grg_malloc (sizeof (GMarkupParser));
@@ -106,7 +106,7 @@ grg_recent_dox_deinit (void)
 static void
 recent_dox_save (void)
 {
-	guchar *path, i = 1;
+	gchar *path, i = 1;
 	GSList *cur;
 	gint fd;
 
@@ -168,7 +168,7 @@ grg_recent_dox_push (const gchar * file)
 	}
 
 	grg_recent_dox =
-		g_slist_prepend (grg_recent_dox, g_strdup ((guchar *) file));
+		g_slist_prepend (grg_recent_dox, g_strdup (file));
 
 	recent_dox_save ();
 	grg_menu_update ();
