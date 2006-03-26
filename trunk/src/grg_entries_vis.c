@@ -216,28 +216,38 @@ find (GtkWidget *widget, gpointer callback_data)
 
 			//to avoid that searching again and again the same text finds
 			//the same portion, we set the cursor AFTER the found text
+			/* And this time really do it -- Shlomi Fish */
 			cursor = gtk_text_buffer_get_mark (entryBuf,
 							   "insert");
 			gtk_text_buffer_get_iter_at_mark (entryBuf, &position,
 							  cursor);
 			endsel = gtk_text_buffer_get_mark (entryBuf,
 							   "selection_bound");
-			gtk_text_iter_set_offset (&position, found);
-			gtk_text_buffer_move_mark (entryBuf, cursor,
-						   &position);
 			gtk_text_iter_set_offset (&position,
 						  found +
 						  g_utf8_strlen (needle, -1));
+			gtk_text_buffer_move_mark (entryBuf, cursor,
+						   &position);
+			gtk_text_iter_set_offset (&position, found);
 			gtk_text_buffer_move_mark (entryBuf, endsel,
 						   &position);
 
-            /*
-             * Make sure that the text-view window scrolls to view the current 
-             * selection.
-             * */
-            gtk_text_view_scroll_mark_onscreen (GTK_TEXT_VIEW (simpleSheet),
+			/*
+			 * Make sure that the text-view window scrolls to
+			 * view the current selection.
+			 * */
+			gtk_text_view_scroll_mark_onscreen (GTK_TEXT_VIEW (simpleSheet),
 				gtk_text_buffer_get_mark (entryBuf,
 				"insert"));
+
+			/*
+			 * Make sure that the sheet gets focus, this is so
+			 * pressing "Find again" consecutively will yield
+			 * a second result, as well, as let the user move the
+			 * cursor immediately.
+			 * */
+			gtk_widget_grab_focus (GTK_WIDGET (simpleSheet));
+
 			break;
 		}
 		else
@@ -257,6 +267,12 @@ find (GtkWidget *widget, gpointer callback_data)
 				     FALSE, parent) == GRG_YES)
 				{
 					grg_entries_first ();
+					/* Call update() now, because we changed the page and
+					 * sync() may be called later, which will otherwise
+					 * cause the first page to be over-rided with the
+					 * info in the current page.
+					 * */
+					update();
 					offset = 0;
 					continue;
 				}
