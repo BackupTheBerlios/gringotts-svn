@@ -1,0 +1,11 @@
+    --------------------------------
+   --- Changes from release 1.2.8 ---
+    --------------------------------
+
+2005-05-14 Mano <mano78@users.sourceforge.net>
+
+	* applied shlomif-3 patches, which enable compilation on newer
+          systems and add a few nice features
+	* added russian and polish translations
+	* improved german translation
+	* the spec file isn't maintained anymore directly by me
