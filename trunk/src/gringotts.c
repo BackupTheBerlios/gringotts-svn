@@ -27,6 +27,7 @@
 #include <locale.h>
 #include <time.h>
 #include <fcntl.h>
+#include <stdio.h>
 
 #include <gtk/gtk.h>
 

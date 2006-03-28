@@ -22,11 +22,25 @@
 #include <gtk/gtk.h>
 
 #include "grg_defs.h"
+#include "grg_entries_vis.h"
 #include "gringotts.h"
 #include "grg_entries.h"
 #include "grg_prefs.h"
 #include "grg_widgets.h"
 
+#include <stdlib.h>
+
+/* Properties */
+enum {
+	PROP_0,
+	PROP_TABS_WIDTH
+};
+
+#define MAX_TAB_WIDTH			32
+#define DEFAULT_TAB_WIDTH 		8
+
+static GObjectClass *parent_class = NULL;
+	
 static GtkClipboard *clip = NULL;
 static gboolean isThereAClip = FALSE;
 
@@ -42,8 +56,29 @@ static GtkTextBuffer *entryBuf = NULL;
 #if 0
 static GtkListStore *mdl = NULL;
 #endif
-static GtkWidget *simpleSheet = NULL/*, *structSheet = NULL*/;
+static GtkCustomTextView *simpleSheet = NULL/*, *structSheet = NULL*/;
 static gulong simpleSigID = 0/*, structSigID = 0*/;
+
+static void gtk_custom_text_view_init (GtkCustomTextView *view);
+static void gtk_custom_text_view_class_init (GtkCustomTextViewClass *klass);
+static guint gtk_custom_text_view_get_tabs_width (GtkCustomTextView *klass);
+static void	gtk_custom_text_view_set_property 		(GObject           *object,
+							 guint              prop_id,
+							 const GValue      *value,
+							 GParamSpec        *pspec);
+static void	gtk_custom_text_view_get_property		(GObject           *object,
+							 guint              prop_id,
+							 GValue            *value,
+							 GParamSpec        *pspec);
+void gtk_custom_text_view_set_tabs_width (GtkCustomTextView *view,
+							 guint          width);
+void gtk_source_view_set_tabs_width (GtkCustomTextView *view,
+							 guint          width);
+GType gtk_custom_text_view_get_type (void);
+static gboolean set_tab_stops_internal (GtkCustomTextView *view);
+static gint	calculate_real_tab_width 		(GtkCustomTextView     *view, 
+							 guint              tab_size,
+							 gchar              c);
 
 void entries_vis_init (void){
 	/*GtkTreeViewColumn *c1, *c2, *c3;
@@ -54,8 +89,10 @@ void entries_vis_init (void){
 		isThereAClip = TRUE;
 
 	entryBuf = gtk_text_buffer_new (NULL);
-	simpleSheet = gtk_text_view_new_with_buffer (entryBuf);
+	simpleSheet = g_object_new (GTK_TYPE_CUSTOM_TEXT_VIEW, NULL);
+	gtk_text_view_set_buffer (GTK_TEXT_VIEW (simpleSheet), GTK_TEXT_BUFFER (entryBuf));
 	gtk_text_view_set_wrap_mode (GTK_TEXT_VIEW (simpleSheet), GTK_WRAP_WORD);
+
 	simpleSigID = g_signal_connect (G_OBJECT (entryBuf), "changed",
 		G_CALLBACK (meta_saveable), GINT_TO_POINTER (GRG_SAVE_ACTIVE));
 /*
@@ -72,6 +109,207 @@ void entries_vis_init (void){
 	gtk_tree_view_append_column (GTK_TREE_VIEW (structSheet), c1);
 	gtk_tree_view_append_column (GTK_TREE_VIEW (structSheet), c2);
 	gtk_tree_view_append_column (GTK_TREE_VIEW (structSheet), c3);*/
+}
+
+static void
+gtk_custom_text_view_init (GtkCustomTextView *view)
+{
+	char* htab_env = getenv("HTAB");
+	int htab = DEFAULT_TAB_WIDTH;
+
+	if (htab_env) {
+		int value;
+		char* chk;
+
+		value = (int)strtol(htab_env, &chk, 10);
+		if (!*chk) {
+			htab = value;
+		}
+	}
+	g_object_set(view, "tabs_width", htab, NULL);
+}
+
+static void
+gtk_custom_text_view_class_init (GtkCustomTextViewClass *klass)
+{
+	GObjectClass	 *object_class;
+	GtkTextViewClass *textview_class;
+	GtkWidgetClass   *widget_class;
+	
+	object_class 	= G_OBJECT_CLASS (klass);
+	textview_class 	= GTK_TEXT_VIEW_CLASS (klass);
+	parent_class 	= g_type_class_peek_parent (klass);
+	widget_class 	= GTK_WIDGET_CLASS (klass);
+	
+	object_class->get_property = gtk_custom_text_view_get_property;
+	object_class->set_property = gtk_custom_text_view_set_property;
+
+	g_object_class_install_property (object_class,
+					 PROP_TABS_WIDTH,
+					 g_param_spec_uint ("tabs_width",
+							    _("Tabs Width"),
+							    _("Tabs Width"),
+							    1,
+							    MAX_TAB_WIDTH,
+							    DEFAULT_TAB_WIDTH,
+							    G_PARAM_READWRITE));
+}
+
+static guint
+gtk_custom_text_view_get_tabs_width (GtkCustomTextView *view)
+{
+	g_return_val_if_fail (view != NULL, FALSE);
+	g_return_val_if_fail (GTK_IS_CUSTOM_TEXT_VIEW (view), FALSE);
+
+	return view->tabs_width;
+}
+
+void
+gtk_custom_text_view_set_tabs_width (GtkCustomTextView *view,
+				guint          width)
+{
+	guint save_width;
+	
+	g_return_if_fail (GTK_CUSTOM_TEXT_VIEW (view));
+	g_return_if_fail (width <= MAX_TAB_WIDTH);
+	g_return_if_fail (width > 0);
+
+	if (view->tabs_width == width)
+		return;
+	
+	gtk_widget_ensure_style (GTK_WIDGET (view));
+	
+	save_width = view->tabs_width;
+	view->tabs_width = width;
+	if (set_tab_stops_internal (view))
+	{
+		g_object_notify (G_OBJECT (view), "tabs_width");
+	}
+	else
+	{
+		g_warning ("Impossible to set tabs width.");
+		view->tabs_width = save_width;
+	}
+}
+
+GType
+gtk_custom_text_view_get_type (void)
+{
+	static GType our_type = 0;
+
+	if (our_type == 0) {
+		static const GTypeInfo our_info = {
+			sizeof (GtkCustomTextViewClass),
+			(GBaseInitFunc) NULL,
+			(GBaseFinalizeFunc) NULL,
+			(GClassInitFunc) gtk_custom_text_view_class_init,
+			NULL,	/* class_finalize */
+			NULL,	/* class_data */
+			sizeof (GtkCustomTextView),
+			0,	/* n_preallocs */
+			(GInstanceInitFunc) gtk_custom_text_view_init
+		};
+		our_type = g_type_register_static (GTK_TYPE_TEXT_VIEW,
+						   "GtkCustomTextView",
+						   &our_info, 0);
+	}
+	return our_type;
+}
+
+static void 
+gtk_custom_text_view_set_property (GObject      *object,
+			      guint         prop_id,
+			      const GValue *value,
+			      GParamSpec   *pspec)
+{
+	GtkCustomTextView *view;
+	
+	g_return_if_fail (GTK_IS_CUSTOM_TEXT_VIEW (object));
+
+	view = GTK_CUSTOM_TEXT_VIEW (object);
+    
+	switch (prop_id)
+	{
+		case PROP_TABS_WIDTH:
+			gtk_custom_text_view_set_tabs_width (view, 
+							g_value_get_uint (value));
+			break;
+		
+		default:
+			G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
+			break;
+	}
+}
+
+static void 
+gtk_custom_text_view_get_property (GObject    *object,
+			      guint       prop_id,
+			      GValue     *value,
+			      GParamSpec *pspec)
+{
+	GtkCustomTextView *view;
+	
+	g_return_if_fail (GTK_IS_CUSTOM_TEXT_VIEW (object));
+
+	view = GTK_CUSTOM_TEXT_VIEW (object);
+    
+	switch (prop_id)
+	{
+		case PROP_TABS_WIDTH:
+			g_value_set_uint (value,
+					  gtk_custom_text_view_get_tabs_width (view));
+			break;
+
+		default:
+			G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
+			break;
+	}
+}
+
+static gboolean
+set_tab_stops_internal (GtkCustomTextView *view)
+{
+	PangoTabArray *tab_array;
+	gint real_tab_width;
+
+	real_tab_width = calculate_real_tab_width (view, view->tabs_width, ' ');
+
+	if (real_tab_width < 0)
+		return FALSE;
+	
+	tab_array = pango_tab_array_new (1, TRUE);
+	pango_tab_array_set_tab (tab_array, 0, PANGO_TAB_LEFT, real_tab_width);
+
+	gtk_text_view_set_tabs (GTK_TEXT_VIEW (view), 
+				tab_array);
+
+	pango_tab_array_free (tab_array);
+
+	return TRUE;
+}
+
+static gint
+calculate_real_tab_width (GtkCustomTextView *view, guint tab_size, gchar c)
+{
+	PangoLayout *layout;
+	gchar *tab_string;
+	gint tab_width = 0;
+
+	if (tab_size == 0)
+		return -1;
+
+	tab_string = g_strnfill (tab_size, c);
+	layout = gtk_widget_create_pango_layout (GTK_WIDGET (view), tab_string);
+	g_free (tab_string);
+
+	if (layout != NULL) {
+		pango_layout_get_pixel_size (layout, &tab_width, NULL);
+		g_object_unref (G_OBJECT (layout));
+		tab_width*=2;
+	} else
+		tab_width = -1;
+
+	return tab_width;
 }
 
 gboolean

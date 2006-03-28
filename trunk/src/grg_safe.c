@@ -46,6 +46,7 @@
 #include <sys/types.h>
 #include <sys/resource.h>
 #include <sys/stat.h>
+#include <stdio.h>
 
 #define GRG_SAFE			0
 #define GRG_SLIGHTLY_UNSAFE	1
@@ -138,6 +139,7 @@ grg_security_filter(gboolean rootCheck)
                    *xauth;
 #endif
     gchar          *lang;
+    gchar          *htab;
 
     if (!rootCheck && (!getuid() || !geteuid()))
 	// forbid usage as root user
@@ -183,6 +185,7 @@ grg_security_filter(gboolean rootCheck)
 
     // extract
     lang = getenv("LANG");
+    htab = getenv("HTAB");
 #ifdef ENV_CHECK
     display = getenv("DISPLAY");
     xauth = getenv("XAUTHORITY");
@@ -222,6 +225,8 @@ grg_security_filter(gboolean rootCheck)
     // re-set (warning: don't free() the g_strconcat'ed strings)
     if (lang != NULL)
 	putenv(g_strconcat("LANG=", lang, NULL));
+    if (htab != NULL)
+	putenv(g_strconcat("HTAB=", htab, NULL));
     putenv(g_strconcat("DISPLAY=", display, NULL));
     if (xauth != NULL)
 	putenv(g_strconcat("XAUTHORITY=", xauth, NULL));

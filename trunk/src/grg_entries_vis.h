@@ -22,6 +22,27 @@
 #ifndef GRG_ENTRIES_VIS_H
 #define GRG_ENTRIES_VIS_H
 
+typedef struct _GtkCustomTextView GtkCustomTextView;
+typedef struct _GtkCustomTextViewClass GtkCustomTextViewClass;
+
+struct _GtkCustomTextView
+{
+	GtkTextView	parent;
+	guint		tabs_width;
+};
+
+struct _GtkCustomTextViewClass 
+{
+	GtkTextViewClass parent_class;
+};
+
+#define GTK_TYPE_CUSTOM_TEXT_VIEW	(gtk_custom_text_view_get_type())
+#define GTK_CUSTOM_TEXT_VIEW(obj)	(G_TYPE_CHECK_INSTANCE_CAST((obj), GTK_TYPE_CUSTOM_TEXT_VIEW, GtkCustomTextView))
+#define GTK_CUSTOM_TEXT_VIEW_CLASS(klass)     (G_TYPE_CHECK_CLASS_CAST ((klass), GTK_TYPE_CUSTOM_TEXT_VIEW, GtkCustomTextViewClass))
+#define GTK_IS_CUSTOM_TEXT_VIEW(obj)          (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GTK_TYPE_CUSTOM_TEXT_VIEW))
+#define GTK_IS_CUSTOM_TEXT_VIEW_CLASS(klass)  (G_TYPE_CHECK_CLASS_TYPE ((klass), GTK_TYPE_CUSTOM_TEXT_VIEW))
+#define GTK_CUSTOM_TEXT_VIEW_GET_CLASS(obj)   (G_TYPE_INSTANCE_GET_CLASS ((obj), GTK_TYPE_CUSTOM_TEXT_VIEW, GtkCustomTextViewClass))
+
 void entries_vis_init (void);
 void entries_vis_deinit (void);
 
@@ -32,8 +53,8 @@ void cucopa (gpointer callback_data, guint callback_action);
 void clear_clipboard (void);
 
 //Search operation
-void find (gpointer callback_data, guint again, GtkWidget *parent);
 void del_needle (void);
 gboolean has_needle (void);
+void find (GtkWidget *widget, gpointer callback_data);
 
 #endif
