@@ -21,3 +21,8 @@
 		* Adds sensitivity to HTAB environment variable to change the 
 		horizontal tab value in the main edition widget (default: 8)
 
+2006-04-04 Shlomi Fish <shlomif@iglu.org.il>
+	* Fix a data corruption bug caused by the previous data corruption bug
+	fix, in which before the search the entry's widget's text was not synced 
+	into memory.
+

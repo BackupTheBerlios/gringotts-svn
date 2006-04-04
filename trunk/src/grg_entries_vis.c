@@ -424,6 +424,12 @@ find (GtkWidget *widget, gpointer callback_data)
 	GtkTextIter position;
 	GtkTextMark *cursor, *endsel;
         GtkWidget *parent = gtk_widget_get_toplevel(widget);
+
+	/* Save the entry into memory, so if update() is called next it will
+	 * be saved. 
+	 * */
+	sync_entry(); 
+
 	if (!again)
 		if (!grg_find_dialog
 		    (&needle, &only_current, &case_sens, GTK_WINDOW (parent)))
