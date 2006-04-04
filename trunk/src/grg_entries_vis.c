@@ -506,7 +506,7 @@ find (GtkWidget *widget, gpointer callback_data)
 				{
 					grg_entries_first ();
 					/* Call update() now, because we changed the page and
-					 * sync() may be called later, which will otherwise
+					 * sync_entry() may be called later, which will otherwise
 					 * cause the first page to be over-rided with the
 					 * info in the current page.
 					 * */
