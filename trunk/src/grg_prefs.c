@@ -529,7 +529,7 @@ grg_pref_dialog (GtkWidget * parent)
 
 	fdesc = pango_font_description_from_string (grg_prefs_editor_font);
 	gtk_widget_modify_font (but_font, fdesc);
-	g_free (fdesc);
+	pango_font_description_free (fdesc);
 
 	g_signal_connect (G_OBJECT (but_font), "clicked",
 			  G_CALLBACK (modify_font), prefs);
