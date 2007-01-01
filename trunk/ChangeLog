@@ -26,3 +26,10 @@
 	fix, in which before the search the entry's widget's text was not synced 
 	into memory.
 
+2007-01-01 Shlomi Fish <shlomif@iglu.org.il>
+	* Made sure that the "Preferences" dialog does not crash gringotss, due
+	to saying "g_free (fdesc)" instead of 
+	"pango_font_description_free (fdesc)".
+	* Released as gringotts-shlomif-0.4.4
+
+
