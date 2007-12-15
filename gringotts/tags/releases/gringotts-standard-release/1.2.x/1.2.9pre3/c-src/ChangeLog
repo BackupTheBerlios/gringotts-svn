@@ -1,0 +1,68 @@
+    --------------------------------
+   --- Changes from release 1.2.8 ---
+    --------------------------------
+
+2005-05-14 Mano <mano78@users.sourceforge.net>
+
+	* applied shlomif-3 patches, which enable compilation on newer
+          systems and add a few nice features
+	* added russian and polish translations
+	* improved german translation
+	* the spec file isn't maintained anymore directly by me
+
+2006-03-28 Shlomi Fish <shlomif@iglu.org.il>
+	* Fix a data corruption bug with the search function.
+	* Fix the "Find again" functionality.
+	* Eliminate many compilation warnings caused due to a confusion between 
+	signed and unsigned char strings.
+	* Integrated a patch by wwp that:
+		* Fixes proto for find() in src/grg_entries_vis.h (not really used anyway)
+		* Fixes compilation on FC3 (missing #includes to stdio.h)
+		* Adds sensitivity to HTAB environment variable to change the 
+		horizontal tab value in the main edition widget (default: 8)
+
+2006-04-04 Shlomi Fish <shlomif@iglu.org.il>
+	* Fix a data corruption bug caused by the previous data corruption bug
+	fix, in which before the search the entry's widget's text was not synced 
+	into memory.
+
+2007-01-01 Shlomi Fish <shlomif@iglu.org.il>
+	* Made sure that the "Preferences" dialog does not crash gringotts, due
+	to saying "g_free (fdesc)" instead of 
+	"pango_font_description_free (fdesc)".
+	* Released as gringotts-shlomif-0.4.4
+
+2007-10-04 Shlomi Fish <shlomif@iglu.org.il>
+	* Added the autogen.sh file to generate the autotools helpers.
+	* Ported the source code to gtk+-2.12.
+	* Applied 02_pixmap_32x32.dpatch from the Debian package. It adds
+	a gringotts-32.xpm pixmap.
+	* Applied 06_check_regcomp_ret.dpatch from the Debian package. It
+	makes the regular expression check for the environment variables in
+	grg_safe.c more robust, and fixes a bug with the display environment.
+	* Applied a modified version of 07_check_ulimit.dpatch from the Debian
+	package. This makes sure that there is a good enough
+	RLIMIT_MEMLOCK in the ulimit for the mlockall operation.
+	* Applied a modified version of 09_check_key.dpatch from the Debian
+	package. The description reads:
+	{{{{{{
+	## DP: Fix invalid gfree() from load_file. And make sure the
+	## DP: to-be-freed verkey is not NULL.
+	}}}}}}
+	* Replaced C++-style comments ("//") with C-style comments ("/* ... */").
+	* Eliminated some warnings (by inspiration and code from
+	13_compiler_warnings.dpatch from the Debian package).
+	* Fixed the load_file() function - abs_filename could have been
+	NULL if the path was already absolute. This was a regression caused
+	by applying a Debian patch. "Save" (not "Save as") now works.
+
+2007-10-08 Shlomi Fish <shlomif@iglu.org.il>
+	* Tagged and released gringotts-1.2.9pre2
+
+2007-12-07 Shlomi Fish <shlomif@iglu.org.il>
+	* Integrated the README.Debian into the README with a note of my own.
+	* Added a note about the SUID-root problem to the error message of the
+	mlock-memory.
+
+2007-12-15 Shlomi Fish <shlomif@iglu.org.il>
+	* Tagged and released gringotts-1.2.9pre3
