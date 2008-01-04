@@ -1,0 +1,26 @@
+# Read all the latemp macros 
+#include "latemp/latemp-prelude.wml"
+
+# You can put some customizations here
+
+<set-var latemp_with_head_meta_tags="1" />
+
+# Actually start the page template.
+#include "latemp/latemp-driver.wml"
+<latemp_lang "en-US" />
+<latemp_encoding "utf-8" />
+<latemp_common_keywords "" />
+<latemp_author "John Smith" />
+
+<latemp_webmaster>
+<p>
+Webmaster and maintainer: <a href="http://www.shlomifish.org/">Shlomi Fish</a>
+(<a href="mailto:shlomif@iglu.org.il">shlomif@iglu.org.il</a>).
+</p>
+</latemp_webmaster>
+
+<latemp_license>
+</latemp_license>
+
+<latemp_affiliations_buttons>
+</latemp_affiliations_buttons>
