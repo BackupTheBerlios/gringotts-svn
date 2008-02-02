@@ -1,0 +1,8 @@
+#include "template.wml"
+#include "texts.wml"
+
+<latemp_subject "About this site" />
+<latemp_version_control_id "$Id$" />
+
+<about_brief />
+
