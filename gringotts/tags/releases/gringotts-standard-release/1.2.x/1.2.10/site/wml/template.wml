@@ -1,0 +1,59 @@
+# Read all the latemp macros 
+#include "latemp/latemp-prelude.wml"
+
+# You can put some customizations here
+
+<set-var latemp_with_head_meta_tags="1" />
+
+# Actually start the page template.
+#include "latemp/latemp-driver.wml"
+<latemp_lang "en-US" />
+<latemp_encoding "utf-8" />
+<latemp_common_keywords "" />
+<latemp_author "John Smith" />
+
+<latemp_webmaster>
+<p>
+Webmaster and maintainer: <a href="http://www.shlomifish.org/">Shlomi Fish</a>
+(<a href="mailto:shlomif@iglu.org.il">shlomif@iglu.org.il</a>).
+</p>
+</latemp_webmaster>
+
+<latemp_license>
+</latemp_license>
+
+<latemp_affiliations_buttons>
+</latemp_affiliations_buttons>
+
+<define-tag gringotts_links>
+<preserve title />
+<set-var %attributes />
+
+<h2 id="links"><get-var title /></h2>
+
+
+<ul>
+
+<li>
+<a href="https://developer.berlios.de/projects/gringotts/">Project Page
+at Berlios.de</a> - contains Subversion information, downloads and other
+resources.
+</li>
+
+<li>
+<a href="http://freshmeat.net/projects/gringotts/">Freshmeat.net Record</a>
+</li>
+
+<li>
+<a href="http://www.nohaven.net/projects/java/jafe/index.html">Jafe</a> -
+a portable strongbox for one's data by the same original author as gringotts.
+</li>
+
+<li>
+<a href="http://www.gtk.org/">Gtk+</a> - the GUI library used by gringotts.
+</li>
+
+</ul>
+<restore title />
+</define-tag>
+
